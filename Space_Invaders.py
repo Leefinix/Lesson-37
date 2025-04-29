@@ -94,4 +94,39 @@ while running:
                 bulletX = playerX
                 fire(bulletX, bulletY)
         if event.type == pygame.KEYUP and event.key in [pygame.K_LEFT, pygame.K_RIGHT]:
-            playerX_change
+            playerX_change = 0
+
+    playerX += playerX_change
+    playerX = max(0, min(playerX, screen_width - 64))
+
+    for i in range(num_enemy):
+        if enemyY[i] > 340:
+            for j in range(num_enemy):
+                enemyY[j] = 2000
+            gameover_text()
+            break
+
+        enemyX[i] += enemyX_change[i]
+        if enemyX[i] <= 0 or enemyX[i] >= screen_width - 64:
+            enemyX_change[i] *= -1
+            enemyY[i] += enemyY_change[i]
+
+        if coll(enemyX[i], enemyY[i], bulletX, bulletY):
+            bulletY = player_starty
+            bullet_state = "ready"
+            score_value += 1
+            enemyX[i] = random.randint(0, screen_width - 64)
+            enemyY[i] = random.randint(enemy_startymin, enemy_startymax)
+
+        enemy(enemyX[i], enemyY[i], i)
+
+    if bulletY <= 0:
+        bulletY = player_starty
+        bullet_state = "ready"
+    elif bullet_state == "fire":
+        fire(bulletX, bulletY)
+        bulletY -= bulletY_change
+
+    player(playerX, playerY)
+    show_score(textX, textY)
+    pygame.display.update()
